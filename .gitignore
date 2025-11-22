@@ -1,3 +1,10 @@
+# Folders
+/build/
+/dist/
+/.vscode/
+/.idea/
+/.cmake/
+
 # Prerequisites
 *.d
 
