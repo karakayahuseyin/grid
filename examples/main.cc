@@ -8,6 +8,7 @@
 
 #include "revak/Socket.h"
 #include "revak/ThreadPool.h"
+#include "revak/Response.h"
 
 #include <iostream>
 #include <string>
@@ -17,18 +18,27 @@
 #define NUMS_THREAD 4
 
 void HandleClient(std::shared_ptr<revak::Socket> client) {
-  std::string body = "Hello from Thread "
-    + std::to_string(std::hash<std::thread::id>{}(std::this_thread::get_id()));
+  // std::string body = "Hello from Thread "
+  //   + std::to_string(std::hash<std::thread::id>{}(std::this_thread::get_id()));
 
-  std::string response =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/plain\r\n"
-        "Content-Length: " + std::to_string(body.size()) + "\r\n"
-        "Connection: close\r\n"
-        "\r\n"
-        + body;
+  // std::string response =
+  //       "HTTP/1.1 200 OK\r\n"
+  //       "Content-Type: text/plain\r\n"
+  //       "Content-Length: " + std::to_string(body.size()) + "\r\n"
+  //       "Connection: close\r\n"
+  //       "\r\n"
+  //       + body;
 
-	::write(client->NativeHandle(), response.c_str(), response.size());
+	revak::Response resp;
+	resp.SetStatus(200);
+	resp.SetHeader("Content-Type", "text/plain");
+	std::string body = "Hello from Thread "
+		+ std::to_string(std::hash<std::thread::id>{}(std::this_thread::get_id()));
+	resp.SetHeader("Content-Length", std::to_string(body.size()));
+	resp.SetHeader("Connection", "close");
+	resp.SetBody(body);
+
+	::write(client->NativeHandle(), resp.ToString().c_str(), resp.ToString().size());
 }    
 
 int main() {

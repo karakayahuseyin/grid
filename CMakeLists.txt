@@ -37,6 +37,7 @@ find_package(Threads REQUIRED)
 add_library(librevak
   src/Socket.cc
   src/ThreadPool.cc
+  src/Response.cc
 )
 
 target_include_directories(librevak PUBLIC 
