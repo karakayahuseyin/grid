@@ -8,6 +8,7 @@
 
 #include "revak/Response.h"
 
+#include <chrono>
 #include <string>
 #include <format>
 
@@ -48,6 +49,14 @@ std::string Response::ToString() const {
     std::format("HTTP/1.1 {} {}\r\n", status_code_, status_message);
 
   std::string headers;
+  
+  // Get current time for Date header
+  auto now = std::chrono::system_clock::now();
+  auto now_t = std::chrono::floor<std::chrono::seconds>(now);
+
+  // Add Server and Date headers
+  headers += "Server: Revak\r\n";
+  headers += std::format("Date: {:%a, %d %b %Y %H:%M:%S} GMT\r\n", now_t);
   // Always set Content-Length header
   headers += std::format("Content-Length: {}\r\n", body_.size());
   for (const auto& [key, val] : headers_) {
