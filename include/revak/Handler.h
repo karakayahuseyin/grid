@@ -6,6 +6,8 @@
  * Licensed under the MIT License. Part of the Revak project.
  */
 
+#pragma once
+
 #include <functional>
 
 namespace revak {
