@@ -11,8 +11,7 @@
 namespace revak {
 
 void Router::AddRoute(const std::string& method, const std::string& path, Handler handler) {
-  Route route{method, path, handler};
-  routes_.emplace_back(std::move(route));
+  routes_.emplace_back(Route{method, path, std::move(handler)});
 }
 
 Response Router::Dispatch(Request& request) {
