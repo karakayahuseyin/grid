@@ -36,6 +36,7 @@ void Server::Run() {
 		thread_pool_.Enqueue([shared_client, this] {
 			// Buffer to store incoming data
       char buffer[4096];
+      // Tech debt: Buffer overflow handling needed
       ssize_t bytes_read = ::read(shared_client->NativeHandle(), buffer, sizeof(buffer));
       if (bytes_read < 0) {
         perror("read");
