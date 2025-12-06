@@ -39,6 +39,7 @@ public:
   Response Dispatch(Request& request);
 
 private: 
+  // Tech debt: Change to more efficient structure:
   // std::map<std::string, std::map<std::string, Handler>> routes_; // <method, <path, handler>>
   std::vector<Route> routes_;
 };
