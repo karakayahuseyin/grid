@@ -37,7 +37,13 @@ void Server::Run() {
 			// Buffer to store incoming data
       char buffer[4096];
       ssize_t bytes_read = ::read(shared_client->NativeHandle(), buffer, sizeof(buffer));
-      if (bytes_read > 0) {
+      if (bytes_read < 0) {
+        perror("read");
+        return;
+      } else if (bytes_read == 0) {
+        // Connection closed by client
+        return;
+      } else {
         std::string request_data(buffer, bytes_read);
         Request req = Request(request_data);
         Response res = this->router_.Dispatch(req);
