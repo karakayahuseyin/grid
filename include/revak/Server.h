@@ -41,25 +41,21 @@ public:
   /// @brief Shortcut for adding GET route
   /// @param path Request path
   /// @param handler Handler function for the route
-  /// @return
   void Get(const std::string& path, Handler handler);
 
   /// @brief Shortcut for adding POST route
   /// @param path Request path
   /// @param handler Handler function for the route
-  /// @return
   void Post(const std::string& path, Handler handler);
 
   /// @brief Shortcut for adding PUT route
   /// @param path Request path
   /// @param handler Handler function for the route
-  /// @return
   void Put(const std::string& path, Handler handler);
   
   /// @brief Shortcut for adding DELETE route
   /// @param path Request path
   /// @param handler Handler function for the route
-  /// @return
   void Delete(const std::string& path, Handler handler);
 
 private:
