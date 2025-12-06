@@ -66,7 +66,7 @@ private:
   uint16_t port_;
   size_t thread_nums_;
   
-  std::atomic<bool> running_;
+  std::atomic<bool> running_{false};
   
   Socket socket_;
   ThreadPool thread_pool_;
