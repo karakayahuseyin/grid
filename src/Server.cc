@@ -8,6 +8,8 @@
 
 #include "revak/Server.h"
 
+#include <stdexcept>
+
 namespace revak {
 
 Server::Server(uint16_t port, size_t thread_nums)
@@ -46,6 +48,9 @@ void Server::Run() {
 }
 
 void Server::AddRoute(const std::string& method, const std::string& path, Handler handler) {
+  if (running_) {
+    throw std::runtime_error("Cannot add routes while server is running");
+  }
   router_.AddRoute(method, path, handler);
 }
 
