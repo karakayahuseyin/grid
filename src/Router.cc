@@ -14,7 +14,7 @@ void Router::AddRoute(const std::string& method, const std::string& path, Handle
   routes_.emplace_back(Route{method, path, std::move(handler)});
 }
 
-Response Router::Dispatch(Request& request) {
+Response Router::Dispatch(const Request& request) {
   for (const auto& route : routes_) {
     if (route.method == request.Method() && route.path == request.Path()) {
       return route.handler(request);
