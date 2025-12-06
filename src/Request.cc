@@ -53,17 +53,4 @@ Request::Request(const std::string_view& request) {
     line_start = line_end + 2;
   }
 }
-
-std::string Request::Method() const {
-  return method_;
 }
-
-std::string Request::Path() const {
-  return path_;
-}
-
-std::string Request::Body() const {
-  return body_;
-}
-
-};

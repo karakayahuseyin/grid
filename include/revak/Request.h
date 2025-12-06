@@ -18,9 +18,9 @@ class Request {
 public:
   Request(const std::string_view& request);
 
-  std::string Method() const;
-  std::string Path() const;
-  std::string Body() const;
+  const std::string& Method() const {return method_;}
+  const std::string& Path() const {return path_;}
+  const std::string& Body() const {return body_;}
 
 private:
   std::string method_;
