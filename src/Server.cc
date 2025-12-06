@@ -9,6 +9,7 @@
 #include "revak/Server.h"
 
 #include <stdexcept>
+#include <unistd.h>
 
 namespace revak {
 
