@@ -13,7 +13,7 @@ Make sure you have a compiler version of gcc that supports all the features of C
 
 ```bash
 mkdir build && cd build
-CXX=g++-12 cmake ..
+CXX=g++-13 cmake ..
 make
 ./bin/revak
 ```
