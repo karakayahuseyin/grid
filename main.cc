@@ -7,6 +7,7 @@
  */
 
 #include "revak/Server.h"
+#include "revak/Logger.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -25,7 +26,8 @@ int main() {
 			return res;
 		});
 		// Start the server
-		std::cout << "Starting server on port 8080..." << std::endl;
+		revak::Logger logger;
+		logger.Log(revak::Logger::Level::INFO, "Starting server on port 8080");
 		server.Run();
 	} catch (const std::exception& e) {
 		std::runtime_error("Server error: " + std::string(e.what()));
