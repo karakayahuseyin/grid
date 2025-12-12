@@ -30,19 +30,19 @@ public:
   Socket& operator=(Socket&& other) noexcept;
 
   /// @brief Connect port and IP to Socket
-  void Bind(uint16_t port);
+  bool Bind(uint16_t port);
 
   /// @brief Puts the Socket to listening mode
-  void Listen();
+  bool Listen();
 
   /// @brief Accepts incoming connection and returns new Socket object
   [[nodiscard]] Socket Accept();
 
   /// @brief Puts to Socket in non-blocking mode
-  void SetNonBlocking();
+  bool SetNonBlocking();
 
   /// @brief Closes the socket
-  void Close();
+  bool Close();
 
   /// @brief Access for raw file descriptor
   [[nodiscard]] int NativeHandle() const { return fd_; }

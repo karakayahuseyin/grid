@@ -41,6 +41,7 @@ add_library(librevak
   src/Request.cc
   src/Router.cc
   src/Server.cc
+  src/Logger.cc
 )
 
 target_include_directories(librevak PUBLIC 

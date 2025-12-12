@@ -9,13 +9,12 @@
 #include <revak/ThreadPool.h>
 
 #include <thread>
-#include <iostream>
 #include <mutex>
 #include <condition_variable>
 
 namespace revak {
 
-ThreadPool::ThreadPool(size_t numThreads) {
+ThreadPool::ThreadPool(size_t numThreads) : stop_(false) {
   for (size_t i = 0; i < numThreads; i++) {
     workers_.emplace_back([this] {
       while(true) {

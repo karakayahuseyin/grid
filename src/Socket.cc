@@ -7,12 +7,12 @@
  */
 
 #include "revak/Socket.h"
+#include "revak/Logger.h"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdexcept>
 #include <cstring>
 
 namespace revak {
@@ -21,7 +21,8 @@ Socket::Socket() {
 	// Create TCP Socket (SOCK_STREAM) with IPv4 protocols (AF_INET) 
 	fd_ = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (fd_ < 0) {
-		throw std::runtime_error("Failed to create socket");
+		Logger::Instance().Log(Logger::Level::ERROR, "Failed to create socket");
+		return;
 	}
 	
 	int opt = 1;
@@ -31,13 +32,13 @@ Socket::Socket() {
 	 */
 	if (::setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
 		Close();
-		throw std::runtime_error("Failed to set SO_REUSEADDR");
+		Logger::Instance().Log(Logger::Level::ERROR, "Failed to set SO_REUSEADDR option");
 	}
 }
 
 Socket::Socket(int fd) : fd_(fd) {
 	if (fd_ < 0) {
-		std::runtime_error("Invalid file descriptor passed to Socket");
+		Logger::Instance().Log(Logger::Level::ERROR, "Invalid file descriptor provided to Socket wrapper");
 	}
 }
 
@@ -58,7 +59,7 @@ Socket& Socket::operator=(Socket&& other) noexcept {
 	return *this;
 }
 
-void Socket::Bind(uint16_t port) {
+bool Socket::Bind(uint16_t port) {
 	struct sockaddr_in addr{};
 	std::memset(&addr, 0, sizeof(addr));
 
@@ -67,16 +68,20 @@ void Socket::Bind(uint16_t port) {
 	addr.sin_port = htons(port);
 
 	if (::bind(fd_, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-		throw std::runtime_error("Failed to bind socket: " + std::string(std::strerror(errno)));
+		Logger::Instance().Log(Logger::Level::ERROR, "Failed to bind server to port " + std::to_string(port));
+		return false;
 	}
+	return true;
 }
 
-void Socket::Listen() {
+bool Socket::Listen() {
   // SOMAXCONN: Maximum wait queue length allowed by the operating system.
   // Usually it is 128 or 4096.
   if (::listen(fd_, SOMAXCONN) < 0) {
-      throw std::runtime_error("Failed to listen on socket");
+      Logger::Instance().Log(Logger::Level::ERROR, "Failed to listen on socket");
+      return false;
   }
+	return true;
 }
 
 Socket Socket::Accept() {
@@ -88,33 +93,38 @@ Socket Socket::Accept() {
 	int client_fd = ::accept(fd_, (struct sockaddr*)&client_addr, &client_len);
 
 	if (client_fd < 0) {
-		throw std::runtime_error("Failed to accept connection");
+		Logger::Instance().Log(Logger::Level::ERROR, "Failed to accept incoming connection");
+		return Socket(-1); // Return invalid Socket
 	}
 
 	// Wrap and return the new fd (Move Semantics implementation)
 	return Socket(client_fd);
 }
 
-void Socket::SetNonBlocking() {
+bool Socket::SetNonBlocking() {
 	// Get exist flags
-	int flags = ::fcntl(fd_, F_GETFL, 0);
-
-	if (flags == -1) {
-		throw std::runtime_error("Failed to get socket flags");
-	}
-
-	// Add O_NONBLOCK flag
-	if (::fcntl(fd_, F_SETFL, flags | O_NONBLOCK) == -1) {
-    throw std::runtime_error("Failed to set non-blocking mode");
+  int flags = ::fcntl(fd_, F_GETFL, 0);
+  if (flags == -1) {
+    Logger::Instance().Log(Logger::Level::ERROR, "Failed to get socket flags: " + std::string(std::strerror(errno)));
+    return false;
   }
+
+  if (::fcntl(fd_, F_SETFL, flags | O_NONBLOCK) == -1) {
+    Logger::Instance().Log(Logger::Level::ERROR, "Failed to set non-blocking mode: " + std::string(std::strerror(errno)));
+    return false;
+  }
+
+  return true;
 }
 
-void Socket::Close() {
+bool Socket::Close() {
 	if (fd_ != -1) {
 		::shutdown(fd_, SHUT_RDWR); // syscall
 		::close(fd_); // syscall
 		fd_ = -1;
+		return true;
 	}
+	return false;
 }
 
 } // namespace revak

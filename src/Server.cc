@@ -7,8 +7,8 @@
  */
 
 #include "revak/Server.h"
+#include "revak/Logger.h"
 
-#include <stdexcept>
 #include <unistd.h>
 
 namespace revak {
@@ -16,11 +16,19 @@ namespace revak {
 Server::Server(uint16_t port, size_t thread_nums)
   : port_(port), thread_nums_(thread_nums), running_(false), thread_pool_(thread_nums)  {
   socket_ = Socket();
-  socket_.Bind(port_);
-  socket_.Listen();
+  if (!socket_.Bind(port_)) {
+    Logger::Instance().Log(Logger::Level::ERROR, "Failed to bind server to port " + std::to_string(port_));
+    return;
+  }
+  if (!socket_.Listen()) {
+    Logger::Instance().Log(Logger::Level::ERROR, "Failed to listen on port " + std::to_string(port_));
+    return;
+  }
+  Logger::Instance().Log(Logger::Level::INFO, "Server started on port " + std::to_string(port_));
 }
 
 Server::~Server() {
+  Logger::Instance().Log(Logger::Level::INFO, "Server stopping...");
   Stop();
 }
 
@@ -29,7 +37,9 @@ void Server::Run() {
   while (running_) {
     // Accept incoming connection
 		Socket client = socket_.Accept();
-		
+    if (client.NativeHandle() < 0) {
+      continue; // Accept failed, try next
+    }
     // Use shared_ptr to manage client socket lifetime in threads
 		auto shared_client = std::make_shared<Socket>(std::move(client));
 
@@ -48,39 +58,44 @@ void Server::Run() {
       } else {
         std::string request_data(buffer, bytes_read);
         Request req = Request(request_data);
-        Response res = this->router_.Dispatch(req);
+        Response res = router_.Dispatch(req);
         ::write(shared_client->NativeHandle(), res.ToString().c_str(), res.ToString().size());
+        Logger::Instance().Log(Logger::Level::INFO, "Handled " + req.Method() + " " + req.Path() + " with status " + std::to_string(res.GetStatusCode()));
       }
 		});
 	}
 }
 
-void Server::AddRoute(const std::string& method, const std::string& path, Handler handler) {
+bool Server::AddRoute(const std::string& method, const std::string& path, Handler handler) {
   if (running_) {
-    throw std::runtime_error("Cannot add routes while server is running");
+    Logger::Instance().Log(Logger::Level::WARNING, "Cannot add route while server is running.");
+    return false;
   }
-  router_.AddRoute(method, path, handler);
+  
+  return router_.AddRoute(method, path, handler);
 }
 
-void Server::Get(const std::string& path, Handler handler) {
-  AddRoute("GET", path, handler);
+bool Server::Get(const std::string& path, Handler handler) {
+  return router_.AddRoute("GET", path, handler);
 }
 
-void Server::Post(const std::string& path, Handler handler) {
-  AddRoute("POST", path, handler);
+bool Server::Post(const std::string& path, Handler handler) {
+  return router_.AddRoute("POST", path, handler);
 }
 
-void Server::Put(const std::string& path, Handler handler) {
-  AddRoute("PUT", path, handler);
+bool Server::Put(const std::string& path, Handler handler) {
+  return router_.AddRoute("PUT", path, handler);
 }
 
-void Server::Delete(const std::string& path, Handler handler) {
-  AddRoute("DELETE", path, handler);
+bool Server::Delete(const std::string& path, Handler handler) {
+  return router_.AddRoute("DELETE", path, handler);
 }
 
-void Server::Stop() {
+bool Server::Stop() {
   running_ = false;
   socket_.Close();
+  Logger::Instance().Log(Logger::Level::INFO, "Server stopped.");
+  return true;
 }
 
 } // namespace revak

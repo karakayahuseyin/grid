@@ -7,29 +7,20 @@
  */
 
 #include "revak/Server.h"
-
-#include <iostream>
-#include <stdexcept>
+#include "revak/Logger.h"
 
 int main() {
-	try {
-		revak::Server server(8080, 4);
+	revak::Server server(8080, 4);
 
-		// Define a simple GET route
-		server.Get("/hello", [](const revak::Request& req) {
-			revak::Response res;
-			res.SetStatus(200);
-			res.SetBody(req.Method() + " " + req.Path() + " says Hello, World!\n");
-			res.SetHeader("Content-Type", "text/plain");
-			res.SetHeader("Connection", "close");
-			return res;
-		});
-		// Start the server
-		std::cout << "Starting server on port 8080..." << std::endl;
-		server.Run();
-	} catch (const std::exception& e) {
-		std::runtime_error("Server error: " + std::string(e.what()));
-		return 1;
-	}
+	server.Get("/hello", [](const revak::Request& req) {
+		revak::Response res;
+		res.SetStatus(200);
+		res.SetBody(req.Method() + " " + req.Path() + " says Hello, World!\n");
+		res.SetHeader("Content-Type", "text/plain");
+		res.SetHeader("Connection", "close");
+		return res;
+	});
+	
+	server.Run();
 	return 0;
 }

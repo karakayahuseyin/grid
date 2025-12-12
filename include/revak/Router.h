@@ -31,7 +31,7 @@ public:
   /// @param method method (e.g., GET, POST)
   /// @param path request path 
   /// @param handler handler function
-  void AddRoute(const std::string& method, const std::string& path, Handler handler);
+  bool AddRoute(const std::string& method, const std::string& path, Handler handler);
 
   /// @brief Dispatch the request to the appropriate handler
   /// @param request Incoming request
