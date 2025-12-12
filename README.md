@@ -41,7 +41,7 @@ cmake --build build
 ### Run
 
 ```bash
-../build/bin/revak
+./build/bin/revak
 ```
 
 The server starts on `http://localhost:8080` by default.
