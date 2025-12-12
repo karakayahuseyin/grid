@@ -20,18 +20,30 @@ namespace revak {
 
 class Logger {
 public:
-  Logger();
-  ~Logger();
+  /// @brief Get the singleton instance of Logger
+  static Logger& Instance();
+  
+  // Disable copy and assignment
+  Logger(const Logger&) = delete;
+  Logger& operator=(const Logger&) = delete;
 
+  /// @brief Log levels
   enum class Level {
     INFO,
     WARNING,
     ERROR
   };
 
+  /// @brief Log a message with the specified level
+  /// @param level Log level (INFO, WARNING, ERROR)
+  /// @param message Message to log
   void Log(Level level, const std::string& message);
 
 private:
+  /// @brief Private constructor for singleton pattern
+  Logger();
+  ~Logger();
+
   // Mutex for thread-safe logging
   std::mutex queue_mutex_;
 

@@ -7,6 +7,7 @@
  */
 
 #include "revak/Response.h"
+#include "revak/Logger.h"
 
 #include <chrono>
 #include <string>
@@ -75,7 +76,7 @@ std::string Response::ToString() const {
     headers += std::format("{}: {}\r\n", key, val);
   }
   headers += "\r\n";
-
+  Logger::Instance().Log(Logger::Level::INFO, "Response returned with status " + std::to_string(status_code_));
   return status_line + headers + body_;
 }
 

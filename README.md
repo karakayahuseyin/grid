@@ -19,13 +19,14 @@ Revak is a multithreaded HTTP/1.1 server that showcases modern C++ design patter
 - **Express-like Routing**: Simple, intuitive API for defining routes with HTTP methods
 - **Modern C++20**: Leverages concepts, string_view, and move semantics for optimal performance
 - **RAII Socket Management**: Automatic resource cleanup with proper error handling
+- **Asynchronous Logging**: Non-blocking logging mechanism to avoid performance bottlenecks
 - **Cross-platform Ready**: Currently Linux-focused with POSIX sockets
 
 ## Requirements
 
 - **Compiler**: GCC 13+ or Clang 15+ with full C++20 support
-- **Build System**: CMake 3.22 or higher
-- **Operating System**: Linux (Ubuntu 20.04+, Fedora 35+, or similar)
+- **Build System**: CMake 3.10 or higher
+- **Operating System**: Linux
 - **Dependencies**: Standard library only (no external dependencies)
 
 ## Quick Start
@@ -33,15 +34,14 @@ Revak is a multithreaded HTTP/1.1 server that showcases modern C++ design patter
 ### Build
 
 ```bash
-mkdir build && cd build
-CXX=g++-13 cmake ..
-make
+cmake -B build
+cmake --build build
 ```
 
 ### Run
 
 ```bash
-./bin/revak
+../build/bin/revak
 ```
 
 The server starts on `http://localhost:8080` by default.
@@ -59,59 +59,6 @@ curl -v http://localhost:8080/hello
 echo -e "GET /hello HTTP/1.1\r\nHost: localhost\r\n\r\n" | nc localhost 8080
 ```
 
-## Usage Example
-
-```cpp
-#include "revak/Server.h"
-#include "revak/Request.h"
-#include "revak/Response.h"
-
-int main() {
-  try {
-    // Create server on port 8080 with 4 worker threads
-    revak::Server server(8080, 4);
-
-    // Define routes
-    server.Get("/hello", [](const revak::Request& req) {
-      revak::Response res(200, "OK");
-      res.SetHeader("Content-Type", "text/plain");
-      res.SetBody("Hello, World!");
-      return res;
-    });
-
-    server.Get("/user/:id", [](const revak::Request& req) {
-      revak::Response res(200, "OK");
-      res.SetBody("User ID: " + req.Path());
-      return res;
-    });
-
-    // Start server (blocks until stopped)
-    server.Run();
-  } catch (const std::exception& e) {
-    std::cerr << "Server error: " << e.what() << '\n';
-    return 1;
-  }
-  return 0;
-}
-```
-
-## Project Structure
-
-```
-revak/
-├── include/revak/     # Public headers
-│   ├── Server.h       # Main server orchestration
-│   ├── Router.h       # Route matching and dispatch
-│   ├── Request.h      # HTTP request parser
-│   ├── Response.h     # HTTP response builder
-│   ├── Socket.h       # POSIX socket wrapper
-│   ├── ThreadPool.h   # Worker thread management
-│   └── Handler.h      # Handler type alias
-├── src/               # Implementation files
-├── build/             # Build artifacts (generated)
-└── main.cc            # Example application
-```
-
 ## Architecture
 
 **Revak** follows a layered architecture:
@@ -127,18 +74,7 @@ revak/
 - **Callback Pattern**: User-defined handlers as std::function
 - **Thread Pool Pattern**: Fixed worker threads process requests from job queue
 
-## Development
-
-### Code Style
-
-This project follows modern C++ best practices:
-- Const-correctness throughout the codebase
-- Move semantics for efficiency
-- `std::string_view` for non-owning string references
-- RAII for all resource management
-- Clear separation between interface and implementation
-
-### Current Limitations
+## Current Limitations
 
 - No HTTPS/TLS support
 - Basic routing (linear search, no path parameters extraction)
@@ -147,28 +83,6 @@ This project follows modern C++ best practices:
 - Blocking I/O (no async/await)
 
 These are intentional for educational clarity and may be addressed in future versions.
-
-## Roadmap
-
-See the [Issues](https://github.com/karakayahuseyin/revak/issues) page for planned features and improvements:
-
-- [ ] Testing infrastructure (Google Test)
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Code quality tools (clang-format, clang-tidy)
-- [ ] Comprehensive documentation (Doxygen)
-- [ ] Router optimization with map-based lookup
-- [ ] Logging system
-- [ ] Static file serving with MIME type detection
-
-## Contributing
-
-This is an educational project. Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 

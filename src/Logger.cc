@@ -14,6 +14,11 @@
 
 namespace revak {
 
+Logger& Logger::Instance() {
+  static Logger instance;
+  return instance;
+}
+
 Logger::Logger() {
   log_thread_ = std::thread([this]() {
     while(true) {

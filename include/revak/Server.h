@@ -30,33 +30,33 @@ public:
   void Run();
 
   /// @brief Stops the server
-  void Stop();
+  bool Stop();
 
   /// @brief Add a new route to the server's router
   /// @param method HTTP method (e.g., GET, POST)
   /// @param path Request path
   /// @param handler Handler function for the route
-  void AddRoute(const std::string& method, const std::string& path, Handler handler);
+  bool AddRoute(const std::string& method, const std::string& path, Handler handler);
 
   /// @brief Shortcut for adding GET route
   /// @param path Request path
   /// @param handler Handler function for the route
-  void Get(const std::string& path, Handler handler);
+  bool Get(const std::string& path, Handler handler);
 
   /// @brief Shortcut for adding POST route
   /// @param path Request path
   /// @param handler Handler function for the route
-  void Post(const std::string& path, Handler handler);
+  bool Post(const std::string& path, Handler handler);
 
   /// @brief Shortcut for adding PUT route
   /// @param path Request path
   /// @param handler Handler function for the route
-  void Put(const std::string& path, Handler handler);
+  bool Put(const std::string& path, Handler handler);
   
   /// @brief Shortcut for adding DELETE route
   /// @param path Request path
   /// @param handler Handler function for the route
-  void Delete(const std::string& path, Handler handler);
+  bool Delete(const std::string& path, Handler handler);
 
 private:
   uint16_t port_;
