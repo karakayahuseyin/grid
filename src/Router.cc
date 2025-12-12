@@ -48,7 +48,6 @@ Response Router::Dispatch(const Request& request) {
   Response response;
   response.SetStatus(404);
   response.SetBody("404 Not Found\n");
-  Logger::Instance().Log(Logger::Level::WARNING, "Route not found: " + request.Method() + " " + request.Path());
   return response;
 }
 

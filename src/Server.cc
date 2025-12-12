@@ -58,8 +58,9 @@ void Server::Run() {
       } else {
         std::string request_data(buffer, bytes_read);
         Request req = Request(request_data);
-        std::string res = this->router_.Dispatch(req).ToString();
-        ::write(shared_client->NativeHandle(), res.c_str(), res.size());
+        Response res = router_.Dispatch(req);
+        ::write(shared_client->NativeHandle(), res.ToString().c_str(), res.ToString().size());
+        Logger::Instance().Log(Logger::Level::INFO, "Handled " + req.Method() + " " + req.Path() + " with status " + std::to_string(res.GetStatusCode()));
       }
 		});
 	}

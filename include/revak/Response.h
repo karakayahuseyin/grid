@@ -43,6 +43,14 @@ public:
   /// @brief Convert the response to a string format suitable for sending
   /// @return Formatted response string
   std::string ToString() const;
+
+  /// @brief Get the status code of the response
+  /// @return Status code as an integer
+  int GetStatusCode() const;
+
+  /// @brief Get the textual representation of the status code
+  /// @return Status text corresponding to the status code
+  std::string GetStatusText() const;
   
 private:
 
